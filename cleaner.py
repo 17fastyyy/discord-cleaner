@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 
 load_dotenv()
 
+days_since_last_msg = 3
+
 md_groups = []
 
 token = os.getenv("DISCORD_TOKEN")
@@ -33,9 +35,11 @@ def clean_groups():
     for canal in md_groups[:]:
         last_msg = snowflake_to_timestamp(canal["last_message_id"])
 
-        if today - last_msg > timedelta(days=3):
+        if today - last_msg > timedelta(days_since_last_msg):
             print(f"Saliendo del grupo: {canal['name']}")
-            # requests.delete(f"https://discord.com/api/v10/channels/{canal['id']}", headers=headers)
+            requests.delete(
+                f"https://discord.com/api/v10/channels/{canal['id']}", headers=headers
+            )
 
 
 clean_groups()
