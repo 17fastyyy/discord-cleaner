@@ -19,9 +19,9 @@ response = requests.get(
 
 res = response.json()
 
-for canal in res:
-    if canal["type"] == 3:
-        md_groups.append(canal)
+for channel in res:
+    if channel["type"] == 3:
+        md_groups.append(channel)
 
 
 def snowflake_to_timestamp(snowflake_id):
@@ -31,15 +31,19 @@ def snowflake_to_timestamp(snowflake_id):
 
 def clean_groups():
     today = datetime.now()
+    count = 0
 
-    for canal in md_groups[:]:
-        last_msg = snowflake_to_timestamp(canal["last_message_id"])
+    for channel in md_groups[:]:
+        last_msg = snowflake_to_timestamp(channel["last_message_id"])
 
-        if today - last_msg > timedelta(days_since_last_msg):
-            print(f"Saliendo del grupo: {canal['name']}")
+        if today - last_msg > timedelta(days=1):
+            print(f"Deleting group: {channel['name']}")
             requests.delete(
-                f"https://discord.com/api/v10/channels/{canal['id']}", headers=headers
+                f"https://discord.com/api/v10/channels/{channel['id']}", headers=headers
             )
+            count += 1
+
+    print(f"You've deleted {count} groups.")
 
 
 clean_groups()
